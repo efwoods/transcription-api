@@ -22,5 +22,6 @@ RUN apt-get update && apt-get install -y ffmpeg && apt-get clean && rm -rf /var/
 
 COPY --from=builder /install_deps /usr/local/
 COPY app/ ./
+COPY .env ./ 
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

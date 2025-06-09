@@ -5,6 +5,7 @@ from fastapi.responses import RedirectResponse
 import uvicorn
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
+from fastapi import Request
 
 from contextlib import asynccontextmanager
 
@@ -16,6 +17,16 @@ from model.whisper_model import model
 
 # API Routes
 from api.routes import router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: initialize Whisper model
+    model.init()
+    
+    yield  # Application runs here
+
+    # Shutdown: (optional cleanup)
+    # e.g., release resources or shutdown thread pools
 
 app = FastAPI(title="Real-Time Whisper Transcription Service", root_path="/transcription-api")
 
@@ -31,27 +42,16 @@ app.add_middleware(
 # Include routers
 app.include_router(router, prefix="/transcribe", tags=["Transcribe"])
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup: initialize Whisper model
-    model.init()
-    
-    yield  # Application runs here
-
-    # Shutdown: (optional cleanup)
-    # e.g., release resources or shutdown thread pools
-
 @app.get("/")
-async def root():
-    metrics.health_requests.inc()
-    return RedirectResponse(url="/health")
-    
+async def root(request: Request):
+    return RedirectResponse(url=request.scope.get("root_path", "") + "/docs")
+
 @app.get("/health")
 async def health():
     metrics.health_requests.inc()
     return {"status": "healthy"}
 
-@app.get("/metrics")
+@app.router.get("/metrics")
 def metrics_endpoint():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 

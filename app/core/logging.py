@@ -7,4 +7,3 @@ logger = logging.getLogger(__name__)
 logger.debug("This is a DEBUG message")
 logger.info("This is an INFO message")
 logger.error("This is an ERROR message")
-

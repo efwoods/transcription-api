@@ -5,6 +5,8 @@ from core.monitoring import metrics
 from core.config import settings
 from core.logging import logger
 import json
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import Response, RedirectResponse
 
 router = APIRouter()
 
@@ -30,3 +32,14 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         await websocket.close()
         metrics.active_websockets.dec()
+
+@router.get("/ws-info", tags=["Transcribe"])
+async def websocket_info():
+    return {
+        "endpoint": "/ws",
+        "protocol": "WebSocket",
+        "description": "Real-time audio transcription WebSocket endpoint.",
+        "input": "Raw PCM audio bytes streamed in small chunks.",
+        "output": "JSON messages containing transcription text.",
+        "note": "Each message must be mono 16-bit PCM, chunked according to SAMPLE_RATE * CHUNK_DURATION * 2.",
+    }
