@@ -1,5 +1,4 @@
-from fastapi import APIRouter
-from fastapi import WebSocket
+from fastapi import APIRouter, WebSocket
 from service.transcription import transcribe_audio
 from core.monitoring import metrics
 from core.config import settings

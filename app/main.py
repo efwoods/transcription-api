@@ -1,11 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 
 import uvicorn
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-from fastapi.responses import Response
-from fastapi import Request
 
 from contextlib import asynccontextmanager
 
@@ -13,7 +11,7 @@ from contextlib import asynccontextmanager
 from core.config import settings
 from core.monitoring import metrics
 from core.logging import logger
-from model.whisper_model import model
+from model.whisper_model_medium import model
 
 # API Routes
 from api.routes import router
@@ -28,7 +26,7 @@ async def lifespan(app: FastAPI):
     # Shutdown: (optional cleanup)
     # e.g., release resources or shutdown thread pools
 
-app = FastAPI(title="Real-Time Whisper Transcription Service", root_path="/transcription-api")
+app = FastAPI(title="Real-Time Whisper Transcription Service", root_path="/transcription-api", lifespan=lifespan)
 
 # CORS middleware
 app.add_middleware(

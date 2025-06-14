@@ -1,5 +1,4 @@
 numpy
-wave
 torch
 openai-whisper
 fastapi
