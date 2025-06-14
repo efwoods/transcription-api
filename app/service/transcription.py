@@ -4,7 +4,7 @@ import wave
 import soundfile as sf
 from core.config import settings
 from core.logging import logger
-from model.whisper_model_medium import model
+from models.whisper_model_medium import model
 
 async def transcribe_audio(audio_data: bytes) -> dict:
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:

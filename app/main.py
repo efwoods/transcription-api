@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from core.config import settings
 from core.monitoring import metrics
 from core.logging import logger
-from model.whisper_model_medium import model
+from models.whisper_model_medium import model
 
 # API Routes
 from api.routes import router
@@ -19,7 +19,7 @@ from api.routes import router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: initialize Whisper model
-    model.init()
+    model().init()
     
     yield  # Application runs here
 
