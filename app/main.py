@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from core.config import settings
 from core.monitoring import metrics
 from core.logging import logger
-from models.whisper_model_medium import model
+from models.whisper_model_base import model
 
 # API Routes
 from api.routes import router
