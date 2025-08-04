@@ -9,3 +9,13 @@ tests/
 .git/
 .dockerignore
 Dockerfile
+.vscode/
+*.log
+.env
+.venv/
+.env.*
+docker-update.sh
+README.md
+LICENSE
+models/
+data/

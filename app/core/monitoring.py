@@ -1,5 +1,6 @@
 from prometheus_client import Counter, Gauge, REGISTRY
 
+
 def get_or_create_metric(name, description, metric_type="counter", labelnames="None"):
     registry = REGISTRY._names_to_collectors
     labelnames = labelnames or []
@@ -16,11 +17,22 @@ def get_or_create_metric(name, description, metric_type="counter", labelnames="N
         raise ValueError(f"Unsupported metric type: {metric_type}")
 
 
-health_requests = get_or_create_metric("health_requests_total", "Total health check requests")
-websocket_url_requests = get_or_create_metric("websocket_url_requests_total", "Total WebSocket URL requests")
-active_websockets = get_or_create_metric("active_websockets", "Number of active WebSocket connections", "gauge")
-transcriptions_processed = get_or_create_metric("transcriptions_processed_total", "Total transcriptions processed")
-websocket_errors = get_or_create_metric("websocket_errors_total", "Total WebSocket errors")
+health_requests = get_or_create_metric(
+    "health_requests_total", "Total health check requests"
+)
+websocket_url_requests = get_or_create_metric(
+    "websocket_url_requests_total", "Total WebSocket URL requests"
+)
+active_websockets = get_or_create_metric(
+    "active_websockets", "Number of active WebSocket connections", "gauge"
+)
+transcriptions_processed = get_or_create_metric(
+    "transcriptions_processed_total", "Total transcriptions processed"
+)
+websocket_errors = get_or_create_metric(
+    "websocket_errors_total", "Total WebSocket errors"
+)
+
 
 class Metrics:
     def __init__(self):
@@ -29,5 +41,6 @@ class Metrics:
         self.active_websockets = active_websockets
         self.transcriptions_processed = transcriptions_processed
         self.websocket_errors = websocket_errors
+
 
 metrics = Metrics()
