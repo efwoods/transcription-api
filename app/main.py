@@ -19,7 +19,11 @@ from api.routes import router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: initialize Whisper model
-    model().init()
+    model_instance = model()
+    if model_instance is None:
+        logger.error("Failed to initialize Whisper model")
+        raise RuntimeError("Whisper model initialization failed")
+    logger.info("Whisper model initialized")
     
     yield  # Application runs here
 

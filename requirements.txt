@@ -8,3 +8,4 @@ soundfile
 prometheus-client
 python-dotenv
 pydantic-settings
+pydub
