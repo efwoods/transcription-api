@@ -1,4 +1,8 @@
 # cloudbuild.yaml
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Auth to Docker Hub
   - name: 'gcr.io/cloud-builders/docker'
