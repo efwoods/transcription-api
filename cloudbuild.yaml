@@ -1,11 +1,4 @@
-# cloudbuild.yaml
-
-options:
-  logging: CLOUD_LOGGING_ONLY
-
-
 steps:
-  # Step 1: Docker Hub login with secret injected
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     secretEnv: ['DOCKER_HUB_CREDENTIALS']
@@ -14,41 +7,25 @@ steps:
       - |
         echo "$DOCKER_HUB_CREDENTIALS" | docker login --username=evdev3 --password-stdin
 
-  # Step 2: Build docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build',
-      '-t',
-      'docker.io/evdev3/transcription-api:$COMMIT_SHA',
-      '.',
-      '-f',
-      'Dockerfile'
-    ]
+    args: ['build', '-t', 'docker.io/evdev3/transcription-api:$COMMIT_SHA', '.', '-f', 'Dockerfile']
 
-  # Step 3: Push docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'push',
-      'docker.io/evdev3/transcription-api:$COMMIT_SHA'
-    ]
+    args: ['push', 'docker.io/evdev3/transcription-api:$COMMIT_SHA']
 
-  # Step 4: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    args: [
-      'run',
-      'deploy',
-      'transcription-api',
-      '--image',
-      'docker.io/evdev3/transcription-api:$COMMIT_SHA',
-      '--region',
-      'us-east1',
-      '--platform',
-      'managed',
-      '--allow-unauthenticated',
-      '--quiet'
-    ]
+    args:
+      [
+        'run', 'deploy', 'transcription-api',
+        '--image', 'docker.io/evdev3/transcription-api:$COMMIT_SHA',
+        '--region', 'us-east1', '--platform', 'managed',
+        '--allow-unauthenticated', '--quiet'
+      ]
 
 availableSecrets:
   secretManager:
-  - versionName: projects/neuralnexus-467517/secrets/docker-hub-credentials/versions/latest
-    env: DOCKER_HUB_CREDENTIALS
+    - versionName: projects/neuralnexus-467517/secrets/docker-hub-credentials/versions/latest
+      env: DOCKER_HUB_CREDENTIALS
+
+options:
+  logging: CLOUD_LOGGING_ONLY
