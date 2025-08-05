@@ -1,0 +1,47 @@
+# cloudbuild.yaml
+steps:
+  # Auth to Docker Hub
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "$(gcloud secrets versions access latest --secret=docker-hub-credentials)" | docker login --username=evdev3 --password-stdin
+
+  # Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t',
+      'docker.io/evdev3/transcription-api:$COMMIT_SHA',
+      '.',
+      '-f',
+      'Dockerfile'
+    ]
+
+  # Push to Docker Hub
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'docker.io/evdev3/transcription-api:$COMMIT_SHA'
+    ]
+
+  # Deploy to Cloud Run from Docker Hub
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run',
+      'deploy',
+      'transcription-api',
+      '--image',
+      'docker.io/evdev3/transcription-api:$COMMIT_SHA',
+      '--region',
+      'us-east1',
+      '--platform',
+      'managed',
+      '--allow-unauthenticated',
+      '--quiet'
+    ]
+
+images:
+  - docker.io/evdev3/transcription-api:$COMMIT_SHA
