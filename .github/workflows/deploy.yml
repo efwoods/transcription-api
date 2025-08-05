@@ -56,4 +56,10 @@ jobs:
             --image=docker.io/$IMAGE_NAME:latest \
             --region=$REGION \
             --platform=managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars POSTGRES_HOST=localhost \
+            --set-env-vars MONGO_DB=mongo_db \
+            --set-env-vars MONGO_HOST=localhost \
+            --set-env-vars REDIS_HOST=redis \
+            --set-env-vars REDIS_PORT=6379  \
+            --set-env-vars WEBSOCKET_PORT=8765
