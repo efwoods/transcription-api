@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 import torch
 
+
 class Settings(BaseSettings):
     # PostgreSQL
     POSTGRES_HOST: str  # no default
@@ -17,8 +18,8 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
 
     # Ngrok / WebSocket
-    FASTAPI_PORT: int = 8000
-    WEBSOCKET_PORT: int = 8000
+    FASTAPI_PORT: int = 8080
+    WEBSOCKET_PORT: int = 8080
 
     # Torch
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
