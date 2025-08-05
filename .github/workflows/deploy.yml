@@ -35,15 +35,23 @@ jobs:
           push: true
           tags: docker.io/${{ env.IMAGE_NAME }}:latest
 
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+            project_id: ${{ env.PROJECT_ID }}
+          
       - name: Deploy to Cloud Run
         run: |
+          export IMAGE_NAME=${{ env.IMAGE_NAME }}
+          export SERVICE_NAME=${{ env.SERVICE_NAME }}
+          export REGION=${{ env.REGION }}
+              
           gcloud run deploy $SERVICE_NAME \
             --image=docker.io/$IMAGE_NAME:latest \
             --region=$REGION \
