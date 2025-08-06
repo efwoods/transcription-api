@@ -8,13 +8,14 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from contextlib import asynccontextmanager
 
 # Configurations & Metrics
-from core.config import settings
-from core.monitoring import metrics
-from core.logging import logger
-from models.whisper_model_base import model
+from app.core.config import settings
+from app.core.monitoring import metrics
+from app.core.logging import logger
+from app.models.whisper_model_base import model
 
 # API Routes
-from api.routes import router
+from app.api.routes import router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,13 +25,18 @@ async def lifespan(app: FastAPI):
         logger.error("Failed to initialize Whisper model")
         raise RuntimeError("Whisper model initialization failed")
     logger.info("Whisper model initialized")
-    
+
     yield  # Application runs here
 
     # Shutdown: (optional cleanup)
     # e.g., release resources or shutdown thread pools
 
-app = FastAPI(title="Real-Time Whisper Transcription Service", root_path="/transcription-api", lifespan=lifespan)
+
+app = FastAPI(
+    title="Real-Time Whisper Transcription Service",
+    root_path="/transcription-api",
+    lifespan=lifespan,
+)
 
 # CORS middleware
 app.add_middleware(
@@ -44,18 +50,22 @@ app.add_middleware(
 # Include routers
 app.include_router(router, prefix="/transcribe", tags=["Transcribe"])
 
+
 @app.get("/")
 async def root(request: Request):
     return RedirectResponse(url=request.scope.get("root_path", "") + "/docs")
+
 
 @app.get("/health")
 async def health():
     metrics.health_requests.inc()
     return {"status": "healthy"}
 
+
 @app.router.get("/metrics")
 def metrics_endpoint():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=settings.FASTAPI_PORT)
