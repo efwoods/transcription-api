@@ -1,6 +1,6 @@
 import whisper
-from core.config import settings
-from core.logging import logger
+from app.core.config import settings
+from app.core.logging import logger
 
 # Initialize Whisper model
 _model = None  # private singleton instance

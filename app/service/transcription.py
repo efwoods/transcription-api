@@ -2,12 +2,13 @@ import numpy as np
 import tempfile
 import wave
 import soundfile as sf
-from core.config import settings
-from core.logging import logger
-from models.whisper_model_base import model
+from app.core.config import settings
+from app.core.logging import logger
+from app.models.whisper_model_base import model
 
 
 async def transcribe_audio(audio_data: bytes) -> dict:
+    model_instance = model()
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
         with wave.open(tmpfile.name, "wb") as wf:
             wf.setnchannels(1)
@@ -31,7 +32,7 @@ async def transcribe_audio(audio_data: bytes) -> dict:
             return {"error": str(e)}
 
         logger.info(f"Transcribing {tmpfile.name}")
-        result = model().transcribe(
+        result = model_instance.transcribe(
             tmpfile.name,
             language="en",
             fp16=settings.DEVICE == "cuda",

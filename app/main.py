@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
@@ -20,11 +21,12 @@ from app.api.routes import router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: initialize Whisper model
-    model_instance = model()
-    if model_instance is None:
-        logger.error("Failed to initialize Whisper model")
-        raise RuntimeError("Whisper model initialization failed")
-    logger.info("Whisper model initialized")
+    # Model on startup rather than lazy loading
+    # model_instance = model()
+    # if model_instance is None:
+    #     logger.error("Failed to initialize Whisper model")
+    #     raise RuntimeError("Whisper model initialization failed")
+    # logger.info("Whisper model initialized")
 
     yield  # Application runs here
 

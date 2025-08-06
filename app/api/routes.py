@@ -1,13 +1,15 @@
 from fastapi import APIRouter, WebSocket
-from service.transcription import transcribe_audio
-from core.monitoring import metrics
-from core.config import settings
-from core.logging import logger
+from app.service.transcription import transcribe_audio
+from app.core.monitoring import metrics
+from app.core.config import settings
+from app.core.logging import logger
 import json
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response, RedirectResponse
 
+
 router = APIRouter()
+
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -18,7 +20,9 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_bytes()
             buffer.extend(data)
-            chunk_size = settings.SAMPLE_RATE * settings.CHUNK_DURATION * 2  # 16-bit mono
+            chunk_size = (
+                settings.SAMPLE_RATE * settings.CHUNK_DURATION * 2
+            )  # 16-bit mono
             while len(buffer) >= chunk_size:
                 chunk = buffer[:chunk_size]
                 buffer = buffer[chunk_size:]
@@ -31,6 +35,7 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         await websocket.close()
         metrics.active_websockets.dec()
+
 
 @router.get("/ws-info", tags=["Transcribe"])
 async def websocket_info():
