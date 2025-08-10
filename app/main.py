@@ -9,29 +9,34 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from contextlib import asynccontextmanager
 
 # Configurations & Metrics
-from app.core.config import settings
-from app.core.monitoring import metrics
-from app.core.logging import logger
-from app.models.whisper_model_base import model
+from core.config import settings
+from core.monitoring import metrics
+from core.logging import logger
 
 # API Routes
-from app.api.routes import router
+from api.routes import router
+
+from models.whisper_model_base import init as init_whisper
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: initialize Whisper model
-    # Model on startup rather than lazy loading
-    # model_instance = model()
-    # if model_instance is None:
-    #     logger.error("Failed to initialize Whisper model")
-    #     raise RuntimeError("Whisper model initialization failed")
-    # logger.info("Whisper model initialized")
+    # Initialize Whisper model at startup
+    try:
+        init_whisper(model_name="tiny")
+    except Exception as e:
+        logger.error("Failed to initialize Whisper at startup: %s", e)
+        raise
 
-    yield  # Application runs here
+    yield
 
-    # Shutdown: (optional cleanup)
-    # e.g., release resources or shutdown thread pools
+    # Optionally call shutdown (releases model ref)
+    try:
+        from models.whisper_model_base import shutdown as shutdown_whisper
+
+        shutdown_whisper()
+    except Exception:
+        pass
 
 
 app = FastAPI(

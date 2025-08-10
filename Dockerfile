@@ -1,33 +1,35 @@
-# Stage 1: Build
-FROM python:3.11-slim AS builder
-
-WORKDIR /app
-
-# Optional: reduce layer size
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y \
-    git ffmpeg libsndfile1-dev build-essential \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-COPY . .
-
-# Stage 2: Runtime image
+# Stage 1: Build & Runtime
 FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    ffmpeg libsndfile1 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Reduce interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-COPY --from=builder /root/.local /root/.local
-COPY --from=builder /app /app
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ffmpeg \
+    libsndfile1-dev \
+    build-essential \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
-ENV PATH=/root/.local/bin:$PATH
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app/ ./
+
+# Environment variables for Whisper model
 ENV TRANSCRIPTION_MODEL=tiny
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Expose port for Cloud Run
+EXPOSE 8080
+
+# Run the FastAPI app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

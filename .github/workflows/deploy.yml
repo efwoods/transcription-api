@@ -57,6 +57,4 @@ jobs:
             --platform=managed \
             --allow-unauthenticated \
             --set-env-vars=POSTGRES_HOST=localhost,MONGO_DB=mongo_db,MONGO_HOST=localhost,REDIS_HOST=redis,REDIS_PORT=6379,WEBSOCKET_PORT=8765 \
-            --memory=1Gi
-
-            
+            --memory=2Gi
